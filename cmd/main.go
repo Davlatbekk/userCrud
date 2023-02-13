@@ -34,4 +34,15 @@ func main() {
 	}
 
 	fmt.Println(id)
+
+	users, e := c.GitListUser(&models.GetListRequest{
+		Limit:  1,
+		Offset: 1,
+	})
+
+	if e != nil {
+		log.Println(e)
+	}
+
+	fmt.Println(users)
 }

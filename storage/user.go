@@ -53,3 +53,18 @@ func (u *userRepo) Create(req *models.CreateUser) (id int, err error) {
 
 	return id, nil
 }
+
+func (u *userRepo) GitListUser(req *models.GetListRequest) (*models.GetListResponse, error) {
+
+	response := models.GetListResponse{
+		Users: make([]*models.User, 0),
+	}
+
+	err := json.NewDecoder(u.file).Decode(&response.Users)
+
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+
+}

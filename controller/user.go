@@ -13,3 +13,13 @@ func (c *Controller) CreateUser(req *models.CreateUser) (id int, err error) {
 
 	return id, nil
 }
+
+func (c *Controller) GitListUser(req *models.GetListRequest) (*models.GetListResponse, error) {
+
+	res, err := c.store.User.GitListUser(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
