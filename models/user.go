@@ -16,6 +16,7 @@ type User struct {
 }
 
 type UpdateUser struct {
+	Id      int    `json:"id"`
 	Name    string `json:"name"`
 	Surname string `json:"urname"`
 }
@@ -26,6 +27,6 @@ type GetListRequest struct {
 }
 
 type GetListResponse struct {
-	Count int     `json:"count"`
-	Users []*User `json:"users"`
+	Count int    `json:"count"`
+	Users []User `json:"users"`
 }

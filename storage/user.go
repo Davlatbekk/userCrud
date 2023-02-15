@@ -3,6 +3,8 @@ package storage
 import (
 	"app/models"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -54,17 +56,66 @@ func (u *userRepo) Create(req *models.CreateUser) (id int, err error) {
 	return id, nil
 }
 
-func (u *userRepo) GitListUser(req *models.GetListRequest) (*models.GetListResponse, error) {
+func (u *userRepo) GitList(req *models.GetListRequest) (models.GetListResponse, error) {
 
-	response := models.GetListResponse{
-		Users: make([]*models.User, 0),
-	}
-
-	err := json.NewDecoder(u.file).Decode(&response.Users)
-
+	data, err := ioutil.ReadFile(u.fileName)
 	if err != nil {
-		return nil, err
+		return models.GetListResponse{}, err
 	}
-	return &response, nil
+	var users []models.User
 
+	err = json.Unmarshal(data, &users)
+	if err != nil {
+		return models.GetListResponse{}, err
+	}
+
+	var count int
+
+	if count > req.Limit {
+		return models.GetListResponse{}, err
+
+		count++
+
+	}
+	return models.GetListResponse{
+		Count: req.Limit,
+		Users: users[req.Offset : req.Limit+req.Offset],
+	}, nil
+}
+
+func (u *userRepo) UpdateUser(req *models.UpdateUser) error {
+	var users []*models.User
+	err := json.NewDecoder(u.file).Decode(&users)
+	if err != nil {
+		return err
+	}
+
+	flag := false
+
+	for i, val := range users {
+
+		if val.Id == req.Id {
+
+			users[i].Name = req.Name
+			users[i].Surname = req.Surname
+
+			flag = true
+		}
+
+	}
+	if flag {
+		return errors.New("BUnday uzgaruvchi yuq")
+	}
+
+	fmt.Println("O'zgartirildi")
+	body, err := json.MarshalIndent(users, "", "   ")
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("data/users.json", body, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return nil
 }
