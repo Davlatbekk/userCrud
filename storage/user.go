@@ -4,8 +4,8 @@ import (
 	"app/models"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
+
 	"os"
 )
 
@@ -47,6 +47,9 @@ func (u *userRepo) Create(req *models.CreateUser) (id int, err error) {
 	}
 
 	body, err := json.MarshalIndent(users, "", "   ")
+	if err != nil {
+		return id, err
+	}
 
 	err = ioutil.WriteFile(u.fileName, body, os.ModePerm)
 	if err != nil {
@@ -58,6 +61,7 @@ func (u *userRepo) Create(req *models.CreateUser) (id int, err error) {
 
 func (u *userRepo) GitList(req *models.GetListRequest) (models.GetListResponse, error) {
 
+	// data, err := ioutil.ReadFile(u.fileName)
 	data, err := ioutil.ReadFile(u.fileName)
 	if err != nil {
 		return models.GetListResponse{}, err
@@ -69,12 +73,8 @@ func (u *userRepo) GitList(req *models.GetListRequest) (models.GetListResponse, 
 		return models.GetListResponse{}, err
 	}
 
-	var count int
-
-	if count > req.Limit {
+	if req.Limit+req.Offset > len(users) {
 		return models.GetListResponse{}, err
-
-		count++
 
 	}
 	return models.GetListResponse{
@@ -107,7 +107,7 @@ func (u *userRepo) UpdateUser(req *models.UpdateUser) error {
 		return errors.New("BUnday uzgaruvchi yuq")
 	}
 
-	fmt.Println("O'zgartirildi")
+	// fmt.Println("O'zgartirildi")
 	body, err := json.MarshalIndent(users, "", "   ")
 	if err != nil {
 		return err
